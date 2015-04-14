@@ -26,6 +26,20 @@ for my $netaddr (
     );
 }
 
+# netmask notation
+my @netmask_list = ();
+for my $m (qw( 128 192 224 240 248 252 254 255 )) {
+    push(@netmask_list, ( "${m}.0.0.0", "255.${m}.0.0", "255.255.${m}.0", "255.255.255.${m}"));
+}
+for my $netmask ( sort @netmask_list ) {
+    my $net = "128.0.0.0/${netmask}";
+    ok(
+        NetObj::IPv4Network::is_valid("${net}"),
+        "${net} is a valid IPv4 subnet",
+    );
+}
+
+# invalid
 for my $netaddr (
     '256.1.1.1/16',  # each byte only up to 255
     '1.256.1.1/16',
