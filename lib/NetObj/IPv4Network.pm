@@ -41,6 +41,17 @@ sub is_valid {
     return !! _to_binary_and_cidr($net);
 }
 
+has binary => ( is => 'ro' );
+has cidr   => ( is => 'ro' );
+
+sub BUILDARGS {
+    my ($class, $net, @args) = @_;
+
+    my $params = _to_binary_and_cidr($net);
+    croak 'invalid IPv4 subnet' unless $params;
+    return $params;
+};
+
 1;
 
 __END__
@@ -67,3 +78,15 @@ accepted.
 
 If called on an object, it throws an exception. Otherwise it just returns true
 or false indicating validity.
+
+=method binary
+
+The C<binary> method returns the raw 4 bytes of the subnet's IPv4 address.
+
+=method cidr
+
+The C<cidr> method returns the number of bits used for the network part of the
+IPv4 address.
+
+=for Pod::Coverage
+BUILDARGS -- internal method
