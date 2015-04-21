@@ -18,19 +18,26 @@ sub _to_binary_and_cidr {
     return unless NetObj::IPv4Address::is_valid($ip);
     $ip = NetObj::IPv4Address->new($ip)->binary();
 
-    # check and return if $mask is already a CIDR specification
+    # check whether $mask is already a CIDR specification
     if ($mask =~ m{\A \d+ \z}xms) {
         return unless (($mask >= 0) and ($mask <= 32));
-        return {binary => $ip, cidr => $mask};
     }
+    else {
+        # check for valid netmask
+        return unless NetObj::IPv4Address::is_valid($mask);
+        $mask = NetObj::IPv4Address->new($mask)->binary();
+        ($mask) = unpack('B32', $mask);
+        return unless ($mask =~ m{\A (1*) 0* \z}xms);
+        $mask = length($1);
+    }
+    # $mask now contains the CIDR length of bits
 
-    # check for valid netmask
-    return unless NetObj::IPv4Address::is_valid($mask);
-    $mask = NetObj::IPv4Address->new($mask)->binary();
-    ($mask) = unpack('B32', $mask);
-    return unless ($mask =~ m{\A (1*) 0* \z}xms);
+    # mask the IP address to the CIDR length to get the network address
+    ($ip) = unpack('B32', $ip);
+    $ip = substr($ip, 0, $mask) . '0' x (32 - $mask);
+    $ip = pack('B32', $ip);
 
-    return {binary => $ip, cidr => length($1)};
+    return {binary => $ip, cidr => $mask};
 }
 
 sub is_valid {

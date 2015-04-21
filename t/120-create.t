@@ -12,8 +12,11 @@ use Test::Exception;
 use NetObj::IPv4Network;
 
 my %valid_nets = (
-    '0.0.0.0/0' => [ "\0\0\0\0", 0 ],
+    '0.0.0.0/0'          => [ "\x00\x00\x00\x00", 0 ],
+    '0.0.0.0/32'         => [ "\x00\x00\x00\x00", 32 ],
+    '255.255.255.255/0'  => [ "\x00\x00\x00\x00", 0 ],
     '255.255.255.255/32' => [ "\xff\xff\xff\xff", 32 ],
+    '192.168.5.34/24'    => [ "\xc0\xa8\x05\x00", 24 ],
 );
 for my $netaddr (keys %valid_nets) {
     my $net = NetObj::IPv4Network->new($netaddr);
