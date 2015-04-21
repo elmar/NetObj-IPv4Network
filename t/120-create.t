@@ -42,3 +42,15 @@ for my $netaddr (
     );
 }
 
+# bad number of arguments in the constructor
+throws_ok(
+    sub { NetObj::IPv4Network->new() },
+    qr{no IPv4 subnet given},
+    'must provide an IPv4 subnet specification',
+);
+
+throws_ok(
+    sub { NetObj::IPv4Network->new('foo', 'bar') },
+    qr{too many arguments},
+    'only one IPv4 subnet allowed in constructor',
+);

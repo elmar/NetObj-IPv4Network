@@ -53,6 +53,8 @@ has cidr   => ( is => 'ro' );
 
 sub BUILDARGS {
     my ($class, $net, @args) = @_;
+    croak 'no IPv4 subnet given' unless defined($net);
+    croak 'too many arguments in constructor for ' . __PACKAGE__ if @args;
 
     my $params = _to_binary_and_cidr($net);
     croak 'invalid IPv4 subnet' unless $params;
