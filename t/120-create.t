@@ -25,6 +25,13 @@ for my $netaddr (keys %valid_nets) {
     is($net->cidr(), $valid_nets{$netaddr}[1], "correct subnet length for $netaddr");
 }
 
+# cloning is valid
+my $net1 = NetObj::IPv4Network->new('192.168.5.34/5');
+my $net2 = NetObj::IPv4Network->new($net1);
+is(ref($net2), 'NetObj::IPv4Network', 'clone a NetObj::IPv4Network object');
+is($net1->binary(), $net2->binary(), 'clone has the same network address');
+is($net1->cidr(), $net2->cidr(), 'clone has the same CIDR length');
+
 # invalid
 for my $netaddr (
     '256.1.1.1/16',  # each byte only up to 255

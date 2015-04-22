@@ -56,6 +56,13 @@ sub BUILDARGS {
     croak 'no IPv4 subnet given' unless defined($net);
     croak 'too many arguments in constructor for ' . __PACKAGE__ if @args;
 
+    if (ref($net) eq __PACKAGE__) {
+        return {
+            binary => $net->binary(),
+            cidr   => $net->cidr(),
+        };
+    }
+
     my $params = _to_binary_and_cidr($net);
     croak 'invalid IPv4 subnet' unless $params;
     return $params;
@@ -73,6 +80,13 @@ __END__
   my $net1 = NetObj::IPv4Network->new('192.168.0.0/16');
   my $net2 = NetObj::IPv4Network->new('192.168.0.0/255.255.0.0');
 
+  # cloning
+  my $net3 = NetObj::IPv4Network->new($net1);
+
+  # test validity
+  NetObj::IPv4Network::is_valid('192.168.0.0/16'); # true
+  NetObj::IPv4Network::is_valid('345.123.0.25/24'); # false
+
 =head1 DESCRIPTION
 
 NetObj::IPv4Network represents IPv4 networks (subnets).
@@ -87,6 +101,14 @@ accepted.
 
 If called on an object, it throws an exception. Otherwise it just returns true
 or false indicating validity.
+
+=method new
+
+The constructor expects one argument representing a valid IPv4 subnet.  CIDR or netmask notation are supported as in the C<is_valid> class method.
+
+Cloning of an existing C<NetObj::IPv4Network> is supported.
+
+The constructor throws an exception for invalid arguments.
 
 =method binary
 
